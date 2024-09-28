@@ -1,0 +1,23 @@
+# Configuration settings for the Earth Simulation Project
+project:
+  name: "Earth Simulation Project"
+  description: "A project to build a virtual simulation of Earth using AI and data from social media platforms."
+
+database:
+  type: "SQLServer"
+  host: "localhost"
+  port: 1433
+  user: "db_user"
+  password: "secure_password"
+  name: "earth_simulation_db"
+
+encryption:
+  method: "AES-256"
+  key: "your-32-byte-long-encryption-key-goes-here"
+
+api:
+  base_url: "http://localhost:3000/api"
+  endpoints:
+    get_tasks: "/tasks"
+    add_task: "/tasks"
+    
