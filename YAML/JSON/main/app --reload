@@ -1,0 +1,7 @@
+bash
+npm start
+Make sure your FastAPI server (uvicorn main:app --reload) is running on http://localhost:8000
+4. Connect the Backend and Frontend
+Make sure your FastAPI server (uvicorn main:app --reload) is running on http://localhost:8000
+Your React app will be running on http://localhost:3000. The YouTubeScraper component connects to the backend using Axios for fetching data from YouTube and processing it with OpenAI.
+GitHu
