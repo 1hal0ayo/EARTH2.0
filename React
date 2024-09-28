@@ -1,0 +1,3 @@
+npx create-react-app youtube-scraper
+cd youtube-scraper
+npm install axios
