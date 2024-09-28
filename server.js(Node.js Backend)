@@ -1,1 +1,69 @@
 server.js (Node.js Backend)
+const express = require('express');
+const sql = require('mssql');
+const bodyParser = require('body-parser');
+const CryptoJS = require('crypto-js');
+
+const app = express();
+app.use(bodyParser.json());
+
+// SQL Server configuration
+const sqlConfig = {
+    user: 'your-username',
+    password: 'your-password',
+    database: 'your-database',
+    server: 'your-server-address',
+    options: {
+        encrypt: true,
+        trustServerCertificate: true,
+    },
+};
+
+// AES encryption key (must match with Python)
+const ENCRYPTION_KEY = 'your-32-byte-long-encryption-key-goes-here';
+
+// Function to decrypt data
+function decryptData(encryptedData) {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+// Function to encrypt data
+function encryptData(data) {
+    return CryptoJS.AES.encrypt(data, ENCRYPTION_KEY).toString();
+}
+
+// Fetch all tasks
+app.get('/api/tasks', async (req, res) => {
+    try {
+        await sql.connect(sqlConfig);
+        const result = await sql.query('SELECT * FROM project_tasks');
+        // Encrypt descriptions before sending to the frontend
+        const encryptedTasks = result.recordset.map(task => ({
+            ...task,
+            description: encryptData(task.description),
+        }));
+        res.json(encryptedTasks);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Add a new task
+app.post('/api/tasks', async (req, res) => {
+    const { description, assigned_to } = req.body;
+    try {
+        await sql.connect(sqlConfig);
+        await sql.query`INSERT INTO project_tasks (description, assigned_to) VALUES (${description}, ${assigned_to})`;
+        res.status(201).json({ message: 'Task added successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Start server
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
+});
